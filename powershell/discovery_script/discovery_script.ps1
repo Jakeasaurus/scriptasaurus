@@ -148,7 +148,7 @@ $RAM = Get-WmiObject -Class Win32_PhysicalMemory | ForEach-Object {
         Speed         = if ($_.Speed) { "$($_.Speed) MHz" } else { "N/A" }
         CapacityInGB  = if ($_.Capacity) { [math]::Round($_.Capacity / 1GB, 2) } else { "N/A" }
     }
-}
+} 
 
 # Total RAM Information
 $TotalRAM = Get-WmiObject -Class Win32_ComputerSystem | ForEach-Object {
@@ -228,18 +228,20 @@ Write-HTML -HTML $UDPListenersHTML -Path $HTMLFilePath
 # NOTE: Section 8: Server Roles
 # Get-WindowsFeature cmdlet is used to retrieve roles, role services, and features that are available or installed on a computer that is running Windows Server 2012 R2.
 # We filter out the ones that are installed. We also format the output to include name, display name, description, and sub features.
-$ServerRoles = Get-WindowsFeature | Where-Object {$_.InstallState -eq "Installed"} | ForEach-Object {
-    $SubFeatures = if ($_.SubFeatures) { ($_.SubFeatures -join ", ") } else { "No sub features" }
-    [PSCustomObject]@{
-        Name = $_.Name
-        DisplayName = $_.DisplayName
-        Description = $_.Description
-        SubFeatures = $SubFeatures
+if ($env:COMPUTERNAME -like "SERVER*") {
+    $ServerRoles = Get-WindowsFeature | Where-Object {$_.InstallState -eq "Installed"} | ForEach-Object {
+        $SubFeatures = if ($_.SubFeatures) { ($_.SubFeatures -join ", ") } else { "No sub features" }
+        [PSCustomObject]@{
+            Name = $_.Name
+            DisplayName = $_.DisplayName
+            Description = $_.Description
+            SubFeatures = $SubFeatures
+        }
     }
-}
 
-$ServerRolesHTML = ConvertTo-HTMLTable -Object $ServerRoles -Title "Server Roles Installed"
-Write-HTML -HTML $ServerRolesHTML -Path $HTMLFilePath
+    $ServerRolesHTML = ConvertTo-HTMLTable -Object $ServerRoles -Title "Server Roles Installed"
+    Write-HTML -HTML $ServerRolesHTML -Path $HTMLFilePath
+}
 
 # NOTE: Section 9: Get the Installed Programs and write them to the HTML file
 $InstalledPrograms32 = Get-ItemProperty "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate

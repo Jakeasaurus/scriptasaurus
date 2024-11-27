@@ -1,3 +1,4 @@
+# NOTE: Setting up the html code before running script. 
 $HTMLHeader = @"
 <html>
 <head>
@@ -20,7 +21,7 @@ $HTMLFooter = @"
 </html>
 "@
 
-# Define a function to convert PowerShell objects to HTML tables
+# NOTE: Define a function to convert PowerShell objects to HTML tables
 function ConvertTo-HTMLTable {
     param(
         [Parameter(Mandatory = $true)]
@@ -94,7 +95,7 @@ function ConvertTo-Cidr {
 ###############################
 # SCRIPT FUNCTIONS
 ###############################
-# Section 1: Windows OS version, hostname, domain, and network information
+# NOTE: Section 1: Windows OS version, hostname, domain, and network information
 $WinOS = Get-WmiObject -Class Win32_OperatingSystem | ForEach-Object {
     [PSCustomObject]@{
         OSVersion = $_.Version
@@ -107,7 +108,7 @@ $WinOS = Get-WmiObject -Class Win32_OperatingSystem | ForEach-Object {
 $WinOSHTML = ConvertTo-HTMLTable -Object $WinOS -Title "Windows OS Version Information"
 Write-HTML -HTML $WinOSHTML -Path $HTMLFilePath
 
-# Section: Network Information
+# NOTE: Section 2: Network Information
 $NetworkInfo = Get-WmiObject -Class Win32_NetworkAdapterConfiguration | Where-Object { $_.IPEnabled -eq $true } | ForEach-Object {
     # Ensure the properties are handled gracefully
     [PSCustomObject]@{
@@ -126,7 +127,7 @@ $NetworkInfo = Get-WmiObject -Class Win32_NetworkAdapterConfiguration | Where-Ob
 $NetworkInfoHTML = ConvertTo-HTMLTable -Object $NetworkInfo -Title "Network Information"
 Write-HTML -HTML $NetworkInfoHTML -Path $HTMLFilePath
 
-# Section 2: Get the CPU information and write it to the HTML file
+# NOTE: Section 3: Get the CPU information and write it to the HTML file
 $CPU = Get-WmiObject -Class Win32_Processor | ForEach-Object {
     [PSCustomObject]@{
         Name                 = $_.Name
@@ -139,7 +140,7 @@ Write-HTML -HTML $CPUHTML -Path $HTMLFilePath
 
 # Section: RAM Information
 
-# Detailed Physical Memory Information
+# NOTE: Section 4: Detailed Physical Memory Information
 $RAM = Get-WmiObject -Class Win32_PhysicalMemory | ForEach-Object {
     [PSCustomObject]@{
         Manufacturer  = if ($_.Manufacturer) { $_.Manufacturer } else { "N/A" }
@@ -155,6 +156,7 @@ $TotalRAM = Get-WmiObject -Class Win32_ComputerSystem | ForEach-Object {
         TotalRAMInGB = if ($_.TotalPhysicalMemory) { [math]::Round($_.TotalPhysicalMemory / 1GB, 2) } else { "N/A" }
     }
 }
+# FIX: The below blocks for some reason cause the headings for the outputs to be incorrect when converted to HTML. Still need to solve. This appears to impact everything after this line that is generated and appended to the html. 
 
 # Convert Detailed RAM Information to HTML
 $RAMHTML = ConvertTo-HTMLTable -Object $RAM -Title "RAM Information"
@@ -165,7 +167,7 @@ $TotalRAMHTML = ConvertTo-HTMLTable -Object $TotalRAM -Title "Total RAM"
 Write-HTML -HTML $TotalRAMHTML -Path $HTMLFilePath
 
 
-# Section: Drives Information
+# NOTE: Section 5: Drives Information
 $Drives = Get-WmiObject -Class Win32_LogicalDisk -Filter "DriveType=3" | ForEach-Object {
     [PSCustomObject]@{
         "Drive Letter"         = if ($_.DeviceID) { $_.DeviceID } else { "N/A" }
@@ -180,7 +182,7 @@ $DrivesHTML = ConvertTo-HTMLTable -Object $Drives -Title "Drives Information"
 Write-HTML -HTML $DrivesHTML -Path $HTMLFilePath
 
 
-# Section: Services Information
+# NOTE: Section 6: Services Information
 $Services = Get-Service | ForEach-Object {
     [PSCustomObject]@{
         "Service Name"     = if ($_.Name) { $_.Name } else { "N/A" }
@@ -194,7 +196,7 @@ $ServicesHTML = ConvertTo-HTMLTable -Object $Services -Title "Services Informati
 Write-HTML -HTML $ServicesHTML -Path $HTMLFilePath
 
 
-# Section 5: Get the TCP and UDP ports in use and write them to the HTML file
+# NOTE: Section 7: Get the TCP and UDP ports in use and write them to the HTML file
 $IPGlobalProperties = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties()
 $TCPConnections = $IPGlobalProperties.GetActiveTcpConnections()
 $UDPListeners = $IPGlobalProperties.GetActiveUdpListeners()
@@ -223,7 +225,7 @@ $UDPListenersHTML = ConvertTo-HTMLTable -Object $UDPListeners -Title "Active UDP
 # Write the UDP Listeners HTML to the file
 Write-HTML -HTML $UDPListenersHTML -Path $HTMLFilePath
 
-# Section 6: Server Roles
+# NOTE: Section 8: Server Roles
 # Get-WindowsFeature cmdlet is used to retrieve roles, role services, and features that are available or installed on a computer that is running Windows Server 2012 R2.
 # We filter out the ones that are installed. We also format the output to include name, display name, description, and sub features.
 $ServerRoles = Get-WindowsFeature | Where-Object {$_.InstallState -eq "Installed"} | ForEach-Object {
@@ -239,7 +241,7 @@ $ServerRoles = Get-WindowsFeature | Where-Object {$_.InstallState -eq "Installed
 $ServerRolesHTML = ConvertTo-HTMLTable -Object $ServerRoles -Title "Server Roles Installed"
 Write-HTML -HTML $ServerRolesHTML -Path $HTMLFilePath
 
-# Section 7: Get the Installed Programs and write them to the HTML file
+# NOTE: Section 9: Get the Installed Programs and write them to the HTML file
 $InstalledPrograms32 = Get-ItemProperty "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate
 $InstalledPrograms64 = Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate
 $AllInstalledPrograms = $InstalledPrograms32 + $InstalledPrograms64 | Where-Object { $_.DisplayName -ne $null } | Sort-Object DisplayName
@@ -247,7 +249,7 @@ $InstalledProgramsHTML = ConvertTo-HTMLTable -Object $AllInstalledPrograms -Titl
 
 Write-HTML -HTML $InstalledProgramsHTML -Path $HTMLFilePath
 
-# Section 8: Check if SQL Server is installed
+# NOTE: Section 10: Check if SQL Server is installed
 $SQLServerInstance = Get-Service | Where-Object { $_.Name -like 'MSSQL$*' }
 
 if ($SQLServerInstance) {

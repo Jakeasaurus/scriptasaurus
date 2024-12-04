@@ -87,23 +87,22 @@ $CPUMarkdown = ConvertTo-MarkdownTable -Object $CPU -Title "CPU Information"
 Write-Markdown -Markdown $CPUMarkdown -Path $MarkdownFilePath
 
 # Section 4: RAM Information
-$RAM = Get-WmiObject -Class Win32_PhysicalMemory | ForEach-Object {
+$RAM = @(Get-WmiObject -Class Win32_PhysicalMemory | ForEach-Object {
     [PSCustomObject]@{
         Manufacturer  = if ($_.Manufacturer) { $_.Manufacturer } else { "N/A" }
         PartNumber    = if ($_.PartNumber) { $_.PartNumber } else { "N/A" }
         Speed         = if ($_.Speed) { "$($_.Speed) MHz" } else { "N/A" }
         CapacityInGB  = if ($_.Capacity) { [math]::Round($_.Capacity / 1GB, 2) } else { "N/A" }
     }
-} 
+})
 
 $RAMMarkdown = ConvertTo-MarkdownTable -Object $RAM -Title "RAM Information"
 Write-Markdown -Markdown $RAMMarkdown -Path $MarkdownFilePath
 
-$TotalRAM = Get-WmiObject -Class Win32_ComputerSystem | ForEach-Object {
-    [PSCustomObject]@{
-        TotalRAMInGB = if ($_.TotalPhysicalMemory) { [math]::Round($_.TotalPhysicalMemory / 1GB, 2) } else { "N/A" }
-    }
-}
+$TotalRAM = @([PSCustomObject]@{
+    'Total RAM (GB)' = (Get-WmiObject -Class Win32_ComputerSystem).TotalPhysicalMemory / 1GB | ForEach-Object { [math]::Round($_, 2) }
+})
+
 $TotalRAMMarkdown = ConvertTo-MarkdownTable -Object $TotalRAM -Title "Total RAM"
 Write-Markdown -Markdown $TotalRAMMarkdown -Path $MarkdownFilePath
 

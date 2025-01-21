@@ -24,7 +24,7 @@ The policy consists of five main statements:
 
 ### Implementation Steps
 
-1. Copy the policy from `mfa-enforcement-policy.json`
+1. Copy the policy from `mfa_enforcement_policy.json`
 2. Create a new IAM policy in your AWS account
 3. Attach the policy to:
    - IAM users directly

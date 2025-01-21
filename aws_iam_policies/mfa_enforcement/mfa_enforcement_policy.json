@@ -50,6 +50,7 @@
         "iam:CreateVirtualMFADevice",
         "iam:EnableMFADevice",
         "iam:GetUser",
+        "iam:ChangePassword",
         "iam:ListMFADevices",
         "iam:ListVirtualMFADevices",
         "iam:ResyncMFADevice",

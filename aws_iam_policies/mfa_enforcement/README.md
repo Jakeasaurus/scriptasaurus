@@ -68,7 +68,7 @@ Feel free to submit issues and enhancement requests!
 
 ## License
 
-[MIT License](LICENSE) or specify your preferred license
+[MIT License](LICENSE)
 
 ## References
 

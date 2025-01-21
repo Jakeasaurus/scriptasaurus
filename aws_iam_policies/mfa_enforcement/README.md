@@ -75,15 +75,3 @@ Feel free to submit issues and enhancement requests!
 - [AWS IAM Best Practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
 - [AWS MFA Documentation](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html)
 ```
-
-This README provides:
-- Clear explanation of the policy's purpose
-- Implementation instructions
-- Structure and usage guidelines
-- Security considerations
-- Best practices
-- Contributing guidelines
-- License information
-- Useful references
-
-Feel free to modify this README to match your specific needs or organizational requirements.

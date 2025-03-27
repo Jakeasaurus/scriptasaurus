@@ -161,7 +161,6 @@ $TotalRAM = Get-WmiObject -Class Win32_ComputerSystem | ForEach-Object {
         TotalRAMInGB = if ($_.TotalPhysicalMemory) { [math]::Round($_.TotalPhysicalMemory / 1GB, 2) } else { "N/A" }
     }
 }
-# FIX: The below blocks for some reason cause the headings for the outputs to be incorrect when converted to HTML. Still need to solve. This appears to impact everything after this line that is generated and appended to the html. 
 
 # Convert Detailed RAM Information to HTML
 $RAMDesiredProperties = @("Manufacturer", "PartNumber", "Speed", "CapacityInGB")

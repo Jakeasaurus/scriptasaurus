@@ -27,7 +27,9 @@ function ConvertTo-HTMLTable {
         [Parameter(Mandatory = $true)]
         [PSObject]$Object,
         [Parameter(Mandatory = $true)]
-        [string]$Title
+        [string]$Title,
+        [Parameter(Mandatory = $true)]
+        [string[]]$Properties
     )
 
     # Start the HTML table with the title
@@ -38,8 +40,8 @@ function ConvertTo-HTMLTable {
 "@
 
     # Add the headers to the table (property names)
-    $Object.PSObject.Properties | ForEach-Object {
-        $HTMLTable += "<th>$($_.Name)</th>"
+    foreach ($property in $Properties) {
+        $HTMLTable += "<th>$property</th>"
     }
 
     $HTMLTable += "</tr>"
@@ -47,8 +49,8 @@ function ConvertTo-HTMLTable {
     # Add the data to the table (property values)
     $Object | ForEach-Object {
         $HTMLTable += "<tr>"
-        $_.PSObject.Properties | ForEach-Object {
-            $HTMLTable += "<td>$($_.Value)</td>"
+        foreach ($property in $Properties) {
+            $HTMLTable += "<td>$($_.$property)</td>"
         }
         $HTMLTable += "</tr>"
     }
@@ -104,8 +106,8 @@ $WinOS = Get-WmiObject -Class Win32_OperatingSystem | ForEach-Object {
         Domain = if ($_.Domain -eq $_.CSName) {"Not Joined to a domain"} else {$_.Domain}
     }
 }
-
-$WinOSHTML = ConvertTo-HTMLTable -Object $WinOS -Title "Windows OS Version Information"
+$WinOSDesiredProperties = @("OSVersion", "OSName", "Hostname", "Domain")
+$WinOSHTML = ConvertTo-HTMLTable -Object $WinOS -Title "Windows OS Version Information" -Properties $WinOSDesiredProperties
 Write-HTML -HTML $WinOSHTML -Path $HTMLFilePath
 
 # NOTE: Section 2: Network Information
@@ -124,7 +126,8 @@ $NetworkInfo = Get-WmiObject -Class Win32_NetworkAdapterConfiguration | Where-Ob
     }
 }
 
-$NetworkInfoHTML = ConvertTo-HTMLTable -Object $NetworkInfo -Title "Network Information"
+$NetworkDesiredProperties = @("Description", "IPAddress", "SubnetMask", "SubnetCIDR", "DefaultGateway", "DHCPServer", "DHCPEnabled", "DNSServers", "MACAddress")
+$NetworkInfoHTML = ConvertTo-HTMLTable -Object $NetworkInfo -Title "Network Information" -Properties $NetworkDesiredProperties
 Write-HTML -HTML $NetworkInfoHTML -Path $HTMLFilePath
 
 # NOTE: Section 3: Get the CPU information and write it to the HTML file
@@ -135,7 +138,9 @@ $CPU = Get-WmiObject -Class Win32_Processor | ForEach-Object {
         NumberOfCores        = $_.NumberOfCores
     }
 }
-$CPUHTML = ConvertTo-HTMLTable -Object $CPU -Title "CPU Information"
+
+$CPUDesiredProperties = @("Name", "MaxClockSpeedInGHz", "NumberOfCores")
+$CPUHTML = ConvertTo-HTMLTable -Object $CPU -Title "CPU Information" $CPUDesiredProperties
 Write-HTML -HTML $CPUHTML -Path $HTMLFilePath
 
 # Section: RAM Information
@@ -148,7 +153,7 @@ $RAM = Get-WmiObject -Class Win32_PhysicalMemory | ForEach-Object {
         Speed         = if ($_.Speed) { "$($_.Speed) MHz" } else { "N/A" }
         CapacityInGB  = if ($_.Capacity) { [math]::Round($_.Capacity / 1GB, 2) } else { "N/A" }
     }
-} 
+}
 
 # Total RAM Information
 $TotalRAM = Get-WmiObject -Class Win32_ComputerSystem | ForEach-Object {
@@ -156,14 +161,15 @@ $TotalRAM = Get-WmiObject -Class Win32_ComputerSystem | ForEach-Object {
         TotalRAMInGB = if ($_.TotalPhysicalMemory) { [math]::Round($_.TotalPhysicalMemory / 1GB, 2) } else { "N/A" }
     }
 }
-# FIX: The below blocks for some reason cause the headings for the outputs to be incorrect when converted to HTML. Still need to solve. This appears to impact everything after this line that is generated and appended to the html. 
 
 # Convert Detailed RAM Information to HTML
-$RAMHTML = ConvertTo-HTMLTable -Object $RAM -Title "RAM Information"
+$RAMDesiredProperties = @("Manufacturer", "PartNumber", "Speed", "CapacityInGB")
+$RAMHTML = ConvertTo-HTMLTable -Object $RAM -Title "RAM Information" $RAMDesiredProperties
 Write-HTML -HTML $RAMHTML -Path $HTMLFilePath
 
 # Convert Total RAM Information to HTML
-$TotalRAMHTML = ConvertTo-HTMLTable -Object $TotalRAM -Title "Total RAM"
+$TotalRAMDesiredProperties = "TotalRAMInGB"
+$TotalRAMHTML = ConvertTo-HTMLTable -Object $TotalRAM -Title "Total RAM" -Properties $TotalRAMDesiredProperties
 Write-HTML -HTML $TotalRAMHTML -Path $HTMLFilePath
 
 
@@ -178,7 +184,8 @@ $Drives = Get-WmiObject -Class Win32_LogicalDisk -Filter "DriveType=3" | ForEach
     }
 }
 
-$DrivesHTML = ConvertTo-HTMLTable -Object $Drives -Title "Drives Information"
+$DrivesDesiredProperties = @("Drive Letter", "Drive Size (GB)", "Free Space (GB)", "Used Space (GB)", "Free Space (%)")
+$DrivesHTML = ConvertTo-HTMLTable -Object $Drives -Title "Drives Information" $DrivesDesiredProperties
 Write-HTML -HTML $DrivesHTML -Path $HTMLFilePath
 
 
@@ -192,7 +199,8 @@ $Services = Get-Service | ForEach-Object {
     }
 }
 
-$ServicesHTML = ConvertTo-HTMLTable -Object $Services -Title "Services Information"
+$ServicesDesiredProperties = @("Service Name", "Display Name", "Status", "Startup Type")
+$ServicesHTML = ConvertTo-HTMLTable -Object $Services -Title "Services Information" $ServicesDesiredProperties
 Write-HTML -HTML $ServicesHTML -Path $HTMLFilePath
 
 
@@ -221,7 +229,9 @@ $UDPListeners = $UDPListeners | ForEach-Object {
         LocalPort    = $_.Port
     }
 }
-$UDPListenersHTML = ConvertTo-HTMLTable -Object $UDPListeners -Title "Active UDP Listeners"
+
+$UDPListenersDesiredProperties = @("LocalAddress", "LocalPort")
+$UDPListenersHTML = ConvertTo-HTMLTable -Object $UDPListeners -Title "Active UDP Listeners" -Properties $UDPListenersDesiredProperties
 # Write the UDP Listeners HTML to the file
 Write-HTML -HTML $UDPListenersHTML -Path $HTMLFilePath
 
@@ -239,7 +249,8 @@ if ($env:COMPUTERNAME -like "SERVER*") {
         }
     }
 
-    $ServerRolesHTML = ConvertTo-HTMLTable -Object $ServerRoles -Title "Server Roles Installed"
+    $ServerRolesDesiredProperties = @("Name", "DisplayName", "Description", "SubFeatures")
+    $ServerRolesHTML = ConvertTo-HTMLTable -Object $ServerRoles -Title "Server Roles Installed" $ServerRolesDesiredProperties
     Write-HTML -HTML $ServerRolesHTML -Path $HTMLFilePath
 }
 
@@ -247,7 +258,8 @@ if ($env:COMPUTERNAME -like "SERVER*") {
 $InstalledPrograms32 = Get-ItemProperty "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate
 $InstalledPrograms64 = Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate
 $AllInstalledPrograms = $InstalledPrograms32 + $InstalledPrograms64 | Where-Object { $_.DisplayName -ne $null } | Sort-Object DisplayName
-$InstalledProgramsHTML = ConvertTo-HTMLTable -Object $AllInstalledPrograms -Title "Installed Programs"
+$InstalledProgramsDesiredProperties = @("DisplayName", "DisplayVersion", "Publisher")
+$InstalledProgramsHTML = ConvertTo-HTMLTable -Object $AllInstalledPrograms -Title "Installed Programs" -Properties $InstalledProgramsDesiredProperties
 
 Write-HTML -HTML $InstalledProgramsHTML -Path $HTMLFilePath
 
@@ -265,7 +277,8 @@ if ($SQLServerInstance) {
         Edition = $SQLServerVersion.Column3
     }
 
-    $SQLServerHTML = ConvertTo-HTMLTable -Object $SQLServerInfo -Title "SQL Server Information"
+    $SQLServerDesiredProperties = @("InstanceName", "Status", "Version", "Level", "Edition")
+    $SQLServerHTML = ConvertTo-HTMLTable -Object $SQLServerInfo -Title "SQL Server Information" -Properties $SQLServerDesiredProperties
 }
 else {
     $SQLServerHTML = @"

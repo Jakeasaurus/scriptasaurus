@@ -8,21 +8,17 @@ Scriptasaurus is a collection of automation scripts and tools for IT infrastruct
 
 ## Repository Structure
 
-The codebase is organized by script type and platform:
+The codebase is organized by **use case** rather than script type, making it easier to find tools for specific IT tasks:
 
-- **`powershell/`** - Windows PowerShell scripts for system administration
-  - System discovery and inventory scripts
-  - Software installation and management
-  - Active Directory operations
-  - Network configuration
-  - TLS/SSL configuration utilities
-  
-- **`bash/`** - Linux shell scripts for system operations
-  - Agent installation scripts
-  - Migration utilities
-  
-- **`batch/`** - Windows batch files for file operations
-  - Robocopy utilities with permission preservation
+- **`scripts/`** - All automation scripts organized by purpose
+  - `system_discovery/` - System inventory and discovery tools
+  - `agent_installation/` - Software agent installation and management
+  - `network_management/` - DNS, networking, and connectivity tools
+  - `active_directory/` - Active Directory operations
+  - `security_compliance/` - Security configurations and compliance
+  - `file_operations/` - File copying and permissions management
+  - `system_maintenance/` - System services and maintenance
+  - `monitoring_tools/` - System monitoring and reporting
   
 - **`aws_cli_commands/`** - AWS CLI command templates and examples
   - EC2 instance queries and management
@@ -32,19 +28,29 @@ The codebase is organized by script type and platform:
 
 ## Key Components
 
-### PowerShell Scripts
-- **Discovery Scripts**: Comprehensive system information gathering (`discovery_script/`) that generates HTML reports with network, hardware, and software details
-- **Software Management**: Automated installation scripts for SSM Agent, Cloudamize, Datto, and AWS MGN
-- **System Utilities**: DNS configuration, service management, disk information gathering
-- **Security Tools**: TLS configuration and checking utilities
+### System Discovery
+- **Discovery Scripts**: Comprehensive system information gathering (`scripts/system_discovery/discovery_script/`) that generates HTML reports with network, hardware, and software details
+- **Domain Discovery**: Active Directory domain discovery tools
+- **System Inventory**: Disk information, software lists, and hardware details
+
+### Agent Installation
+- **AWS Agents**: SSM Agent, MGN Agent, and Application Discovery Agent installation
+- **Third-Party Agents**: Cloudamize (Windows/Linux), Datto, CloudEndure management
+- **Cross-Platform**: Automated installation scripts for both Windows and Linux
+
+### Network & Infrastructure
+- **DNS Management**: Static and dynamic DNS configuration tools
+- **Connectivity Testing**: Bulk ping testing and network diagnostics
+- **File Operations**: Permission-preserving file copying utilities
+
+### Security & Compliance
+- **TLS Configuration**: TLS 1.2 enablement and verification scripts
+- **Domain Management**: Trust relationship fixes and AD operations
+- **AWS Security**: Production-ready MFA enforcement IAM policies
 
 ### AWS Components
 - **IAM Policies**: Production-ready MFA enforcement policy with detailed documentation
 - **CLI Templates**: Reusable AWS CLI commands for common EC2 operations
-
-### Cross-Platform Tools
-- **Migration Utilities**: Scripts for installing migration agents on both Windows and Linux
-- **File Operations**: Batch scripts for copying files while preserving permissions
 
 ## Common Development Tasks
 
@@ -54,16 +60,16 @@ The codebase is organized by script type and platform:
 PowerShell -ExecutionPolicy Bypass -File script_name.ps1
 
 # Run discovery script and generate HTML report
-.\powershell\discovery_script\discovery_script.ps1
+.\scripts\system_discovery\discovery_script\discovery_script.ps1
 ```
 
 ### Working with Bash Scripts
 ```bash
 # Make scripts executable
-chmod +x bash/script_name.sh
+chmod +x scripts/agent_installation/script_name.sh
 
 # Run bash scripts
-./bash/script_name.sh
+./scripts/agent_installation/script_name.sh
 ```
 
 ### AWS Operations

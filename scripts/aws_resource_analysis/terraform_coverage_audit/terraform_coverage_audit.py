@@ -152,6 +152,11 @@ def setup_logging(verbose: bool) -> None:
 def boto3_session(profile: str) -> boto3.Session:
     """Create a boto3 session with the specified profile."""
     try:
+        # If AWS credentials are in environment variables, use them directly
+        if os.environ.get('AWS_ACCESS_KEY_ID') and os.environ.get('AWS_SECRET_ACCESS_KEY'):
+            logger.debug("Using AWS credentials from environment variables")
+            return boto3.session.Session()
+        # Otherwise use the specified profile
         return boto3.session.Session(profile_name=profile)
     except Exception as e:
         logger.error(f"Failed to create boto3 session with profile '{profile}': {e}")

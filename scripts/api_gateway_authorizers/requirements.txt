@@ -1,0 +1,13 @@
+# Optional security enhancement
+# Install this for maximum XML security protection
+defusedxml>=0.7.0
+
+# The authorizer works without this dependency using Python's built-in xml.etree.ElementTree
+# but defusedxml provides better protection against XML vulnerabilities like:
+# - Billion laughs attack
+# - Quadratic blowup attack  
+# - External entity expansion
+# - DTD retrieval
+
+# To install:
+# pip install -r requirements.txt -t ./package/

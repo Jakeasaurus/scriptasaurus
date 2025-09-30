@@ -1,0 +1,68 @@
+{
+  "simple_authorizer_valid_xml": {
+    "type": "TOKEN",
+    "authorizationToken": "Bearer token123",
+    "resource": "/xml/validate", 
+    "body": "<?xml version=\"1.0\"?><order><item>laptop</item><quantity>2</quantity></order>",
+    "headers": {
+      "Content-Type": "application/xml",
+      "User-Agent": "PostmanRuntime/7.29.0"
+    }
+  },
+
+  "simple_authorizer_invalid_xml": {
+    "type": "TOKEN",
+    "authorizationToken": "Bearer token123", 
+    "resource": "/xml/validate",
+    "body": "<?xml version=\"1.0\"?><order><unclosed-item>laptop</order>",
+    "headers": {
+      "Content-Type": "application/xml"
+    }
+  },
+
+  "simple_authorizer_dangerous_xml": {
+    "type": "TOKEN",
+    "authorizationToken": "Bearer token123",
+    "resource": "/xml/validate", 
+    "body": "<?xml version=\"1.0\"?>\n<!DOCTYPE order [\n  <!ENTITY xxe SYSTEM \"file:///etc/passwd\">\n]>\n<order>&xxe;</order>",
+    "headers": {
+      "Content-Type": "application/xml"
+    }
+  },
+
+  "simple_authorizer_empty_body": {
+    "type": "TOKEN",
+    "authorizationToken": "Bearer token123",
+    "resource": "/xml/validate",
+    "body": "",
+    "headers": {}
+  },
+
+  "policy_authorizer_valid_xml": {
+    "methodArn": "arn:aws:execute-api:us-east-1:123456789012:abcdef123/test/POST/xml/*",
+    "body": "<?xml version=\"1.0\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><order><item>laptop</item></order></soap:Body></soap:Envelope>",
+    "headers": {
+      "Content-Type": "text/xml; charset=utf-8",
+      "User-Agent": "SoapClient/1.0"
+    },
+    "requestContext": {
+      "identity": {
+        "sourceIp": "203.0.113.25"
+      }
+    }
+  },
+
+  "policy_authorizer_base64_xml": {
+    "methodArn": "arn:aws:execute-api:us-east-1:123456789012:abcdef123/test/POST/xml/*",
+    "body": "PD94bWwgdmVyc2lvbj0iMS4wIj8+PGRhdGE+PGl0ZW0+dGVzdDwvaXRlbT48L2RhdGE+",
+    "isBase64Encoded": true,
+    "headers": {
+      "Content-Type": "application/xml"
+    },
+    "requestContext": {
+      "identity": {
+        "sourceIp": "203.0.113.30"
+      }
+    }
+  }
+}

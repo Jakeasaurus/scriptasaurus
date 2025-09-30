@@ -20,7 +20,9 @@ scriptasaurus/
 │   ├── security_compliance/        # Security configurations and compliance
 │   ├── file_operations/            # File copying and permissions management
 │   ├── system_maintenance/         # System services and maintenance
-│   └── monitoring_tools/           # System monitoring and reporting
+│   ├── monitoring_tools/           # System monitoring and reporting
+│   ├── api_gateway_authorizers/    # AWS API Gateway Lambda authorizers
+│   └── aws_resource_analysis/      # AWS infrastructure analysis and auditing
 ├── aws_cli_commands/               # AWS CLI command templates and examples
 └── aws_iam_policies/               # AWS IAM security policies
 ```
@@ -91,6 +93,18 @@ System service and maintenance scripts:
 
 System monitoring and reporting utilities:
 - **get_services_list_for_list_of_computers** - Remote service monitoring across multiple systems
+
+### 🔐 API Gateway Authorizers
+**Path:** `scripts/api_gateway_authorizers/`
+
+AWS API Gateway Lambda authorizer functions:
+- **xml_validation** - Lambda authorizer that validates XML content in API Gateway requests with default allow policy
+
+### 🔬 AWS Resource Analysis
+**Path:** `scripts/aws_resource_analysis/`
+
+AWS infrastructure analysis and auditing tools:
+- **terraform_coverage_audit** - Scan AWS Organizations to identify Terraform-managed vs. unmanaged resources across all accounts
 
 ### ☁️ AWS Components
 

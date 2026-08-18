@@ -180,7 +180,7 @@ fi
 if [ -n "$PROJECT_NAME" ]; then
     run_aws_command \
         "API Gateway Domain Names (filtered)" \
-        "aws apigateway get-domain-names --region $AWS_REGION --output json | jq '[.items[] | select(.domainName | contains(\"gosunward.org\") or contains(\"$PROJECT_NAME\"))]'" \
+        "aws apigateway get-domain-names --region $AWS_REGION --output json | jq '[.items[] | select(.domainName | contains(\"your-domain.com\") or contains(\"$PROJECT_NAME\"))]'" \
         "03-api-gateway-domains.json"
 else
     run_aws_command \
@@ -332,7 +332,7 @@ fi
 if [ -n "$PROJECT_NAME" ]; then
     run_aws_command \
         "ACM Certificates (filtered)" \
-        "aws acm list-certificates --region $AWS_REGION --output json | jq '[.CertificateSummaryList[] | select(.DomainName | contains(\"gosunward.org\") or contains(\"$PROJECT_NAME\"))]'" \
+        "aws acm list-certificates --region $AWS_REGION --output json | jq '[.CertificateSummaryList[] | select(.DomainName | contains(\"your-domain.com\") or contains(\"$PROJECT_NAME\"))]'" \
         "16-acm-certificates.json"
 else
     run_aws_command \
